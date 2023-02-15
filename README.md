@@ -11,6 +11,7 @@ npm i @liangshen/plist-cli -g
 ## 使用方法
 
 **比如我有个 plist 文件(是 Iterm2 软件的编好文件)**
+
 `~/Library/Preferences/com.googlecode.iterm2.plist`
 
 ```shell
