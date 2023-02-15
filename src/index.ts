@@ -1,32 +1,15 @@
-#!/usr/bin/env node
-import {Argument, program} from 'commander';
-import { createRequire } from 'module';
 import os from "os";
 import bPlistParser from "bplist-parser";
-import fs from "fs";
 import camelcase from "camelcase";
-const require = createRequire(import.meta.url);
+import fs from "fs";
 
-program.version(require('../package.json').version, '-v, --version')
-
-program
-    .addArgument(new Argument('<target>', 'target plist'))
-    .option('-n, --name [name]', 'output name')
-    .option('-o, --output [output]', 'output dir', './')
-    .action((target, cmd) => {
-        build(target, cmd)
-    });
-
-program.parse();
-
-
-export function build(target: string, options: {output?: string, name?: string}) {
+export function generate(target: string, options: {output?: string, name?: string} = {}) {
     let plistPath = target.replace(/^~/, os.homedir);
     let plistJson = bPlistParser.parseFileSync(plistPath);
     let name = plistPath.slice(plistPath.lastIndexOf('/') + 1)
         .replace(/\./g, '_');
     let className =  camelcase(options.name || name, {pascalCase: true});
-    let fileName = (camelcase(options.name || name)).replace(/[A-Z]/g, m => "-" + m.toLowerCase())
+    let fileName = (camelcase(options.name || name)).replace(/[A-Z]/g, (m: string) => "-" + m.toLowerCase())
     let dts = `export interface ${className} ${parseJson(plistJson[0])}`;
     fs.writeFileSync(`${options.output || ''}${fileName}.d.ts`, dts)
 }
